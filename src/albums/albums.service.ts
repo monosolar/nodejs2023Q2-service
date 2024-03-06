@@ -51,9 +51,9 @@ export class AlbumsService {
       throw new HttpException('Incomplete data', HttpStatus.BAD_REQUEST);
     }
 
-    const albumIndex = this.albums.findIndex((user) => user.id === id);
+    const albumIndex = this.albums.findIndex((album) => album.id === id);
     if (albumIndex === -1) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }
 
     this.albums[albumIndex] = {
@@ -68,7 +68,7 @@ export class AlbumsService {
 
   async deleteAlbum(id: V4Options) {
     validateUuid(id);
-    const albumIndex = this.albums.findIndex((Album) => Album.id === id);
+    const albumIndex = this.albums.findIndex((album) => album.id === id);
     if (albumIndex === -1) {
       throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }

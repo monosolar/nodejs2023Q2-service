@@ -49,9 +49,9 @@ export class ArtistsService {
       throw new HttpException('Incomplete data', HttpStatus.BAD_REQUEST);
     }
 
-    const artistIndex = this.artists.findIndex((user) => user.id === id);
+    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
     if (artistIndex === -1) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }
 
     this.artists[artistIndex] = { ...this.artists[artistIndex], name, grammy };
