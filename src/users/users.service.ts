@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { V4Options, v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from './dto/creare.user.dto';
 import { UpdatePasswordDto } from './dto/update.user.dto';
-import { cloneObject, isUuidV4 } from 'src/utils';
+import { cloneObject, validateUuid } from 'src/utils';
 
 export interface User {
   id: string; // uuid v4
@@ -28,12 +28,6 @@ type UserToReturn = Modify<
 export class UsersService {
   private users: User[] = [];
 
-  private validateUuid(id: V4Options) {
-    if (!isUuidV4(id)) {
-      throw new HttpException('Invalid user id', HttpStatus.BAD_REQUEST);
-    }
-  }
-
   private getUserSecured(user: User): UserToReturn {
     const clonedUser = cloneObject(user);
     delete clonedUser?.password;
@@ -46,7 +40,7 @@ export class UsersService {
   }
 
   async getUserById(id: V4Options): Promise<UserToReturn> {
-    this.validateUuid(id);
+    validateUuid(id);
     const user = this.users.find((user) => user.id === id);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -78,7 +72,7 @@ export class UsersService {
     id: V4Options,
     updatePasswordDto: UpdatePasswordDto,
   ): Promise<UserToReturn> {
-    this.validateUuid(id);
+    validateUuid(id);
     const { oldPassword, newPassword } = updatePasswordDto;
 
     if (!oldPassword || !newPassword) {
@@ -100,7 +94,7 @@ export class UsersService {
   }
 
   async deleteUser(id: V4Options): Promise<void> {
-    this.validateUuid(id);
+    validateUuid(id);
     const userIndex = this.users.findIndex((user) => user.id === id);
     if (userIndex === -1) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
