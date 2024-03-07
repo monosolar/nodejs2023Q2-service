@@ -2,6 +2,8 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { V4Options, v4 as uuidv4 } from 'uuid';
 
 import { validateUuid } from 'src/utils';
+import { TracksService } from 'src/tracks/tracks.service';
+import { AlbumsService } from 'src/albums/albums.service';
 
 export interface Artist {
   id: string; // uuid v4
@@ -11,6 +13,11 @@ export interface Artist {
 
 @Injectable()
 export class ArtistsService {
+  constructor(
+    private tracksService: TracksService,
+    private albumsService: AlbumsService,
+  ) {}
+
   private artists: Artist[] = [];
 
   async getIsExist(id: V4Options) {
@@ -75,5 +82,7 @@ export class ArtistsService {
       throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }
     this.artists.splice(artistIndex, 1);
+    this.tracksService.deleteArtists(id);
+    this.albumsService.deleteArtists(id);
   }
 }

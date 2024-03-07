@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { ArtistsService } from 'src/artists/artists.service';
 import { validateUuid } from 'src/utils';
 import { V4Options, v4 as uuidv4 } from 'uuid';
 
@@ -85,5 +86,23 @@ export class TracksService {
       throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
     }
     this.tracks.splice(trackIndex, 1);
+  }
+
+  async deleteArtists(artistId: V4Options) {
+    this.tracks = this.tracks.map((track) => {
+      if (track.artistId === artistId) {
+        track.artistId = null;
+      }
+      return track;
+    });
+  }
+
+  async deleteAlbum(albumId: V4Options) {
+    this.tracks = this.tracks.map((track) => {
+      if (track.albumId === albumId) {
+        track.albumId = null;
+      }
+      return track;
+    });
   }
 }
