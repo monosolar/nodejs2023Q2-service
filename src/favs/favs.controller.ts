@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Controller, Delete, Get, HttpCode, Param, Post } from '@nestjs/common';
 import { V4Options } from 'uuid';
 import { FavsService } from './favs.service';
 
@@ -27,16 +27,19 @@ export class FavsController {
   }
 
   @Delete('track/:id')
+  @HttpCode(204)
   async deleteTrack(@Param('id') id: V4Options) {
     return await this.favsService.deleteTrack(id);
   }
 
   @Delete('artist/:id')
+  @HttpCode(204)
   async deleteArtist(@Param('id') id: V4Options) {
     return await this.favsService.deleteArtist(id);
   }
 
   @Delete('album/:id')
+  @HttpCode(204)
   async deleteAlbum(@Param('id') id: V4Options) {
     return await this.favsService.deleteAlbum(id);
   }

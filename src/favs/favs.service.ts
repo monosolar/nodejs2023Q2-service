@@ -5,7 +5,7 @@ import { Track, TracksService } from 'src/tracks/tracks.service';
 import { validateUuid } from 'src/utils';
 import { V4Options } from 'uuid';
 
-interface FavoritesResponse {
+export interface FavoritesResponse {
   artists: Artist[];
   albums: Album[];
   tracks: Track[];
@@ -89,16 +89,21 @@ export class FavsService {
 
   async deleteTrack(id: V4Options) {
     validateUuid(id);
-    return [];
+    const foundIndex = await this.tracksIds.findIndex((item) => item === id);
+    this.tracksIds.splice(foundIndex, 1);
   }
 
   async deleteArtist(id: V4Options) {
     validateUuid(id);
+    const foundIndex = await this.artistsIds.findIndex((item) => item === id);
+    this.artistsIds.splice(foundIndex, 1);
     return [];
   }
 
   async deleteAlbum(id: V4Options) {
     validateUuid(id);
+    const foundIndex = await this.albumsIds.findIndex((item) => item === id);
+    this.albumsIds.splice(foundIndex, 1);
     return [];
   }
 }
