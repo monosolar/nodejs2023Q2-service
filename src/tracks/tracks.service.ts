@@ -14,6 +14,7 @@ export interface Track {
 @Injectable()
 export class TracksService {
   private tracks: Track[] = [];
+  private favIds: V4Options[] = [];
 
   async getIsExist(id: V4Options) {
     const idx = this.tracks.findIndex((item) => item.id === id);
@@ -86,6 +87,11 @@ export class TracksService {
       throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
     }
     this.tracks.splice(trackIndex, 1);
+
+    const favIndex = this.favIds.findIndex((favId) => favId === id);
+    if (favIndex > -1) {
+      this.favIds.splice(favIndex, 1);
+    }
   }
 
   async deleteArtists(artistId: V4Options) {
@@ -104,5 +110,33 @@ export class TracksService {
       }
       return track;
     });
+  }
+
+  async getFav() {
+    return this.getByIds(this.favIds);
+  }
+
+  async addFav(id: V4Options) {
+    validateUuid(id);
+
+    const artistIndex = await this.getIsExist(id);
+    if (artistIndex === -1) {
+      throw new HttpException(
+        'Artist not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    if (!this.favIds.includes(id)) {
+      this.favIds.push(id);
+    }
+
+    return id;
+  }
+
+  async deleteFav(id: V4Options) {
+    validateUuid(id);
+    const foundIndex = await this.favIds.findIndex((item) => item === id);
+    this.favIds.splice(foundIndex, 1);
   }
 }

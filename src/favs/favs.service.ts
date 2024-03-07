@@ -1,8 +1,7 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Album, AlbumsService } from 'src/albums/albums.service';
 import { Artist, ArtistsService } from 'src/artists/artists.service';
 import { Track, TracksService } from 'src/tracks/tracks.service';
-import { validateUuid } from 'src/utils';
 import { V4Options } from 'uuid';
 
 export interface FavoritesResponse {
@@ -19,91 +18,37 @@ export class FavsService {
     private artistsService: ArtistsService,
   ) {}
 
-  private albumsIds: V4Options[] = [];
-  private tracksIds: V4Options[] = [];
-  private artistsIds: V4Options[] = [];
-
   async getAll(): Promise<FavoritesResponse> {
     const favorites = {
-      tracks: await this.tracksService.getByIds(this.tracksIds),
-      albums: await this.albumsService.getByIds(this.albumsIds),
-      artists: await this.artistsService.getByIds(this.artistsIds),
+      tracks: await this.tracksService.getFav(),
+      albums: await this.albumsService.getFav(),
+      artists: await this.artistsService.getFav(),
     };
 
     return favorites;
   }
 
   async addTrack(id: V4Options) {
-    validateUuid(id);
-
-    const trackIndex = await this.tracksService.getIsExist(id);
-    if (trackIndex === -1) {
-      throw new HttpException(
-        'Track not found',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    if (!this.tracksIds.includes(id)) {
-      this.tracksIds.push(id);
-    }
-
-    return id;
+    await this.tracksService.addFav(id);
   }
 
   async addArtist(id: V4Options) {
-    validateUuid(id);
-
-    const artistIndex = await this.artistsService.getIsExist(id);
-    if (artistIndex === -1) {
-      throw new HttpException(
-        'Artist not found',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    if (!this.artistsIds.includes(id)) {
-      this.artistsIds.push(id);
-    }
-
-    return id;
+    await this.artistsService.addFav(id);
   }
 
   async addAlbum(id: V4Options) {
-    validateUuid(id);
-
-    const albumIndex = await this.albumsService.getIsExist(id);
-    if (albumIndex === -1) {
-      throw new HttpException(
-        'Album not found',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    if (!this.albumsIds.includes(id)) {
-      this.albumsIds.push(id);
-    }
-
-    return id;
+    await this.albumsService.addFav(id);
   }
 
   async deleteTrack(id: V4Options) {
-    validateUuid(id);
-    const foundIndex = await this.tracksIds.findIndex((item) => item === id);
-    this.tracksIds.splice(foundIndex, 1);
+    await this.tracksService.deleteFav(id);
   }
 
   async deleteArtist(id: V4Options) {
-    validateUuid(id);
-    const foundIndex = await this.artistsIds.findIndex((item) => item === id);
-    this.artistsIds.splice(foundIndex, 1);
-    return [];
+    await this.artistsService.deleteFav(id);
   }
 
   async deleteAlbum(id: V4Options) {
-    validateUuid(id);
-    const foundIndex = await this.albumsIds.findIndex((item) => item === id);
-    this.albumsIds.splice(foundIndex, 1);
-    return [];
+    await this.albumsService.deleteFav(id);
   }
 }

@@ -15,6 +15,7 @@ export class AlbumsService {
   constructor(private tracksService: TracksService) {}
 
   private albums: Album[] = [];
+  private favIds: V4Options[] = [];
 
   async getIsExist(id: V4Options) {
     const idx = this.albums.findIndex((item) => item.id === id);
@@ -87,6 +88,10 @@ export class AlbumsService {
     }
     this.albums.splice(albumIndex, 1);
     this.tracksService.deleteAlbum(id);
+    const favIndex = this.favIds.findIndex((favId) => favId === id);
+    if (favIndex > -1) {
+      this.favIds.splice(favIndex, 1);
+    }
   }
 
   async deleteArtists(artistId: V4Options) {
@@ -96,5 +101,33 @@ export class AlbumsService {
       }
       return album;
     });
+  }
+
+  async getFav() {
+    return this.getByIds(this.favIds);
+  }
+
+  async addFav(id: V4Options) {
+    validateUuid(id);
+
+    const artistIndex = await this.getIsExist(id);
+    if (artistIndex === -1) {
+      throw new HttpException(
+        'Artist not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    if (!this.favIds.includes(id)) {
+      this.favIds.push(id);
+    }
+
+    return id;
+  }
+
+  async deleteFav(id: V4Options) {
+    validateUuid(id);
+    const foundIndex = await this.favIds.findIndex((item) => item === id);
+    this.favIds.splice(foundIndex, 1);
   }
 }
