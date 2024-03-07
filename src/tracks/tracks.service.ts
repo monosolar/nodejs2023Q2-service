@@ -14,6 +14,11 @@ export interface Track {
 export class TracksService {
   private tracks: Track[] = [];
 
+  async getIsExist(id: V4Options) {
+    const idx = this.tracks.findIndex((item) => item.id === id);
+    return idx;
+  }
+
   async getAllTracks(): Promise<Track[]> {
     return this.tracks;
   }
@@ -54,7 +59,7 @@ export class TracksService {
       throw new HttpException('Wrong data', HttpStatus.BAD_REQUEST);
     }
 
-    const trackIndex = this.tracks.findIndex((track) => track.id === id);
+    const trackIndex = await this.getIsExist(id);
     if (trackIndex === -1) {
       throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
     }

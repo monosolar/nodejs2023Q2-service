@@ -11,7 +11,7 @@ import {
 import { Artist, ArtistsService } from './artists.service';
 import { V4Options } from 'uuid';
 
-@Controller('Artist')
+@Controller('artist')
 export class ArtistsController {
   constructor(private readonly artistService: ArtistsService) {}
 

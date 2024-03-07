@@ -13,7 +13,7 @@ export interface Artist {
 export class ArtistsService {
   private artists: Artist[] = [];
 
-  getAllArtists(): Artist[] {
+  async getAllArtists(): Promise<Artist[]> {
     return this.artists;
   }
 
