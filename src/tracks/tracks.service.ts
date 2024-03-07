@@ -23,6 +23,10 @@ export class TracksService {
     return this.tracks;
   }
 
+  async getByIds(ids: V4Options[]): Promise<Track[]> {
+    return this.tracks.filter((item) => ids.includes(item.id as V4Options));
+  }
+
   async getTrackById(id: V4Options): Promise<Track> {
     validateUuid(id);
     const track = this.tracks.find((Track) => Track.id === id);
@@ -76,7 +80,7 @@ export class TracksService {
 
   async deleteTrack(id: V4Options) {
     validateUuid(id);
-    const trackIndex = this.tracks.findIndex((Track) => Track.id === id);
+    const trackIndex = await this.getIsExist(id);
     if (trackIndex === -1) {
       throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
     }

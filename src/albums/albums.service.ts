@@ -13,8 +13,17 @@ export interface Album {
 export class AlbumsService {
   private albums: Album[] = [];
 
+  async getIsExist(id: V4Options) {
+    const idx = this.albums.findIndex((item) => item.id === id);
+    return idx;
+  }
+
   async getAllAlbums(): Promise<Album[]> {
     return this.albums;
+  }
+
+  async getByIds(ids: V4Options[]): Promise<Album[]> {
+    return this.albums.filter((item) => ids.includes(item.id as V4Options));
   }
 
   async getAlbumById(id: V4Options): Promise<Album> {
@@ -51,7 +60,7 @@ export class AlbumsService {
       throw new HttpException('Incomplete data', HttpStatus.BAD_REQUEST);
     }
 
-    const albumIndex = this.albums.findIndex((album) => album.id === id);
+    const albumIndex = await this.getIsExist(id);
     if (albumIndex === -1) {
       throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }
@@ -68,7 +77,8 @@ export class AlbumsService {
 
   async deleteAlbum(id: V4Options) {
     validateUuid(id);
-    const albumIndex = this.albums.findIndex((album) => album.id === id);
+
+    const albumIndex = await this.getIsExist(id);
     if (albumIndex === -1) {
       throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
     }

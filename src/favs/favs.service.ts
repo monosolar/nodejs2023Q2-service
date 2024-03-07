@@ -25,9 +25,9 @@ export class FavsService {
 
   async getAll(): Promise<FavoritesResponse> {
     const favorites = {
-      tracks: await this.tracksService.getAllTracks(),
-      albums: await this.albumsService.getAllAlbums(),
-      artists: await this.artistsService.getAllArtists(),
+      tracks: await this.tracksService.getByIds(this.tracksIds),
+      albums: await this.albumsService.getByIds(this.albumsIds),
+      artists: await this.artistsService.getByIds(this.artistsIds),
     };
 
     return favorites;
@@ -53,12 +53,38 @@ export class FavsService {
 
   async addArtist(id: V4Options) {
     validateUuid(id);
-    return [];
+
+    const artistIndex = await this.artistsService.getIsExist(id);
+    if (artistIndex === -1) {
+      throw new HttpException(
+        'Artist not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    if (!this.artistsIds.includes(id)) {
+      this.artistsIds.push(id);
+    }
+
+    return id;
   }
 
   async addAlbum(id: V4Options) {
     validateUuid(id);
-    return [];
+
+    const albumIndex = await this.albumsService.getIsExist(id);
+    if (albumIndex === -1) {
+      throw new HttpException(
+        'Album not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
+    }
+
+    if (!this.albumsIds.includes(id)) {
+      this.albumsIds.push(id);
+    }
+
+    return id;
   }
 
   async deleteTrack(id: V4Options) {

@@ -13,8 +13,17 @@ export interface Artist {
 export class ArtistsService {
   private artists: Artist[] = [];
 
+  async getIsExist(id: V4Options) {
+    const idx = this.artists.findIndex((item) => item.id === id);
+    return idx;
+  }
+
   async getAllArtists(): Promise<Artist[]> {
     return this.artists;
+  }
+
+  async getByIds(ids: V4Options[]): Promise<Artist[]> {
+    return this.artists.filter((item) => ids.includes(item.id as V4Options));
   }
 
   async getArtistById(id: V4Options): Promise<Artist> {
@@ -49,7 +58,7 @@ export class ArtistsService {
       throw new HttpException('Incomplete data', HttpStatus.BAD_REQUEST);
     }
 
-    const artistIndex = this.artists.findIndex((artist) => artist.id === id);
+    const artistIndex = await this.getIsExist(id);
     if (artistIndex === -1) {
       throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }
@@ -61,7 +70,7 @@ export class ArtistsService {
 
   async deleteArtist(id: V4Options): Promise<void> {
     validateUuid(id);
-    const artistIndex = this.artists.findIndex((Artist) => Artist.id === id);
+    const artistIndex = await this.getIsExist(id);
     if (artistIndex === -1) {
       throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
     }

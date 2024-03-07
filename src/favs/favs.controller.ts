@@ -16,7 +16,7 @@ export class FavsController {
     return await this.favsService.addTrack(id);
   }
 
-  @Post('addArtist/:id')
+  @Post('artist/:id')
   async addArtist(@Param('id') id: V4Options) {
     return await this.favsService.addArtist(id);
   }
@@ -31,13 +31,13 @@ export class FavsController {
     return await this.favsService.deleteTrack(id);
   }
 
-  @Delete('addArtist/:id')
+  @Delete('artist/:id')
   async deleteArtist(@Param('id') id: V4Options) {
     return await this.favsService.deleteArtist(id);
   }
 
   @Delete('album/:id')
   async deleteAlbum(@Param('id') id: V4Options) {
-    return await this.favsService.addTrack(id);
+    return await this.favsService.deleteAlbum(id);
   }
 }
