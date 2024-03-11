@@ -19,9 +19,12 @@ npm install
 
 ## Running application
 
+1. Create copy of .env.example with name .env . Change variables there if it's needed.
+2. 
 ```
 npm start
 ```
+
 
 ## NOTES
 
