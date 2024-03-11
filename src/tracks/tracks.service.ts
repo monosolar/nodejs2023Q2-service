@@ -122,7 +122,7 @@ export class TracksService {
     const artistIndex = await this.getIsExist(id);
     if (artistIndex === -1) {
       throw new HttpException(
-        'Artist not found',
+        'Track not found',
         HttpStatus.UNPROCESSABLE_ENTITY,
       );
     }
