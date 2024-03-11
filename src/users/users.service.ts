@@ -2,7 +2,7 @@ import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { V4Options, v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from './dto/creare.user.dto';
 import { UpdatePasswordDto } from './dto/update.user.dto';
-import { cloneObject, validateUuid } from 'src/utils';
+import { cloneObject } from 'src/utils';
 
 export interface User {
   id: string; // uuid v4
@@ -40,7 +40,6 @@ export class UsersService {
   }
 
   async getUserById(id: V4Options): Promise<UserToReturn> {
-    validateUuid(id);
     const user = this.users.find((user) => user.id === id);
     if (!user) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);
@@ -72,7 +71,6 @@ export class UsersService {
     id: V4Options,
     updatePasswordDto: UpdatePasswordDto,
   ): Promise<UserToReturn> {
-    validateUuid(id);
     const { oldPassword, newPassword } = updatePasswordDto;
 
     if (!oldPassword || !newPassword) {
@@ -94,7 +92,6 @@ export class UsersService {
   }
 
   async deleteUser(id: V4Options): Promise<void> {
-    validateUuid(id);
     const userIndex = this.users.findIndex((user) => user.id === id);
     if (userIndex === -1) {
       throw new HttpException('User not found', HttpStatus.NOT_FOUND);

@@ -7,6 +7,7 @@ import {
   Put,
   Delete,
   HttpCode,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/creare.user.dto';
 import { UpdatePasswordDto } from './dto/update.user.dto';
@@ -23,7 +24,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  async getUserById(@Param('id') id: V4Options) {
+  async getUserById(@Param('id', new ParseUUIDPipe()) id: V4Options) {
     return await this.userService.getUserById(id);
   }
 
@@ -34,7 +35,7 @@ export class UsersController {
 
   @Put(':id')
   async updateUserPassword(
-    @Param('id') id: V4Options,
+    @Param('id', new ParseUUIDPipe()) id: V4Options,
     @Body() updatePasswordDto: UpdatePasswordDto,
   ) {
     return await this.userService.updateUserPassword(id, updatePasswordDto);
@@ -42,7 +43,7 @@ export class UsersController {
 
   @Delete(':id')
   @HttpCode(204)
-  async deleteUser(@Param('id') id: V4Options) {
+  async deleteUser(@Param('id', new ParseUUIDPipe()) id: V4Options) {
     return await this.userService.deleteUser(id);
   }
 }
