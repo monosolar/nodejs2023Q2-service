@@ -6,8 +6,6 @@ import {
   Body,
   Put,
   Delete,
-  HttpException,
-  HttpStatus,
   HttpCode,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/creare.user.dto';

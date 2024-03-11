@@ -1,5 +1,4 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { ArtistsService } from 'src/artists/artists.service';
 import { validateUuid } from 'src/utils';
 import { V4Options, v4 as uuidv4 } from 'uuid';
 
