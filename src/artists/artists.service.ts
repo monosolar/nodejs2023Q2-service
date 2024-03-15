@@ -1,12 +1,11 @@
-import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { V4Options, v4 as uuidv4 } from 'uuid';
-
-import { validateUuid } from 'src/utils';
-import { TracksService } from 'src/tracks/tracks.service';
-import { AlbumsService } from 'src/albums/albums.service';
+import { Injectable } from '@nestjs/common';
+import { ArtistEntity } from './artists.entity';
+import { CreateArtistrDto } from './dto/creare.artist.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 export interface Artist {
-  id: string; // uuid v4
+  id: string;
   name: string;
   grammy: boolean;
 }
@@ -14,51 +13,27 @@ export interface Artist {
 @Injectable()
 export class ArtistsService {
   constructor(
-    private tracksService: TracksService,
-    private albumsService: AlbumsService,
+    @InjectRepository(ArtistEntity)
+    private readonly usersRepository: Repository<Artist>,
   ) {}
 
-  private artists: Artist[] = [];
-  private favIds: V4Options[] = [];
-
-  async getIsExist(id: V4Options) {
-    const idx = this.artists.findIndex((item) => item.id === id);
-    return idx;
+  async create(createArtistDto: CreateArtistrDto) {
+    return await this.usersRepository.save(createArtistDto);
   }
 
-  async getAllArtists(): Promise<Artist[]> {
-    return this.artists;
+  async getAll() {
+    return await this.usersRepository.find();
   }
 
-  async getByIds(ids: V4Options[]): Promise<Artist[]> {
-    return this.artists.filter((item) => ids.includes(item.id as V4Options));
+  async getById(id: string) {
+    return await this.usersRepository.findOneBy({ id });
   }
 
-  async getArtistById(id: V4Options): Promise<Artist> {
-    validateUuid(id);
-    const artist = this.artists.find((Artist) => Artist.id === id);
-    if (!artist) {
-      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
-    }
-    return artist;
+  async delete(id: string) {
+    return await this.usersRepository.delete({ id });
   }
 
-  async createArtist(artist: Artist): Promise<Artist> {
-    const { name, grammy } = artist;
-    if (!name || typeof grammy !== 'boolean') {
-      throw new HttpException('Incomplete data', HttpStatus.BAD_REQUEST);
-    }
-
-    const newArtist: Artist = {
-      id: uuidv4(),
-      name,
-      grammy,
-    };
-    this.artists.push(newArtist);
-    return newArtist;
-  }
-
-  async updateArtist(id: V4Options, artist: Artist): Promise<Artist> {
+  /* async updateArtist(id: V4Options, artist: Artist): Promise<Artist> {
     validateUuid(id);
     const { name, grammy } = artist;
 
@@ -74,49 +49,5 @@ export class ArtistsService {
     this.artists[artistIndex] = { ...this.artists[artistIndex], name, grammy };
 
     return this.artists[artistIndex];
-  }
-
-  async deleteArtist(id: V4Options): Promise<void> {
-    validateUuid(id);
-    const artistIndex = await this.getIsExist(id);
-    if (artistIndex === -1) {
-      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
-    }
-    this.artists.splice(artistIndex, 1);
-    this.tracksService.deleteArtists(id);
-    this.albumsService.deleteArtists(id);
-
-    const favIndex = this.favIds.findIndex((favId) => favId === id);
-    if (favIndex > -1) {
-      this.favIds.splice(favIndex, 1);
-    }
-  }
-
-  async getFav() {
-    return this.getByIds(this.favIds);
-  }
-
-  async addFav(id: V4Options) {
-    validateUuid(id);
-
-    const artistIndex = await this.getIsExist(id);
-    if (artistIndex === -1) {
-      throw new HttpException(
-        'Artist not found',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    if (!this.favIds.includes(id)) {
-      this.favIds.push(id);
-    }
-
-    return id;
-  }
-
-  async deleteFav(id: V4Options) {
-    validateUuid(id);
-    const foundIndex = await this.favIds.findIndex((item) => item === id);
-    this.favIds.splice(foundIndex, 1);
-  }
+  } */
 }

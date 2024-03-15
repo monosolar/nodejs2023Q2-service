@@ -1,72 +1,58 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import { V4Options, v4 as uuidv4 } from 'uuid';
 import { CreateUserDto } from './dto/creare.user.dto';
 import { UpdatePasswordDto } from './dto/update.user.dto';
 import { cloneObject } from 'src/utils';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UsersEntity } from './users.entity';
 
 export interface User {
-  id: string; // uuid v4
+  id: string;
   login: string;
   password: string;
-  version: number; // integer number, increments on update
-  createdAt: number; // timestamp of creation
-  updatedAt: number; // timestamp of last update
-  /*
-   */
 }
-
-type Modify<T, R> = Pick<T, Exclude<keyof T, keyof R>> & R;
-
-type UserToReturn = Modify<
-  User,
-  {
-    password: string;
-  }
->;
 
 @Injectable()
 export class UsersService {
-  private users: User[] = [];
+  constructor(
+    @InjectRepository(UsersEntity)
+    private readonly usersRepository: Repository<User>,
+  ) {}
 
-  private getUserSecured(user: User): UserToReturn {
-    const clonedUser = cloneObject(user);
-    delete clonedUser?.password;
+  async create(createUserDto: CreateUserDto) {
+    const user: User = new UsersEntity();
+    user.login = createUserDto.login;
+    user.password = createUserDto.password;
 
-    return clonedUser as UserToReturn;
+    return await this.usersRepository.save(user);
   }
 
-  async getAllUsers(): Promise<UserToReturn[]> {
-    return this.users.map((user) => this.getUserSecured(user));
+  async getAll() {
+    return await this.usersRepository.find();
   }
 
-  async getUserById(id: V4Options): Promise<UserToReturn> {
-    const user = this.users.find((user) => user.id === id);
-    if (!user) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+  async getById(id: string) {
+    return await this.usersRepository.findOneBy({ id });
+  }
+
+  async delete(id: string) {
+    return await this.usersRepository.delete({ id });
+  }
+
+  async updateUserPassword(id: string, updatePasswordDto: UpdatePasswordDto) {
+    const { oldPassword, newPassword } = updatePasswordDto;
+    const user = await this.getById(id);
+
+    if (user.password !== oldPassword) {
+      throw new HttpException('Incorrect old password', HttpStatus.FORBIDDEN);
     }
-    return this.getUserSecured(user);
+
+    await this.usersRepository.update(user.id, { password: newPassword });
+
+    return await this.getById(user.id);
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserToReturn> {
-    const { login, password } = createUserDto;
-    if (!login || !password) {
-      throw new HttpException(
-        'Missing login or password',
-        HttpStatus.BAD_REQUEST,
-      );
-    }
-    const newUser: User = {
-      id: uuidv4(),
-      login,
-      password,
-      version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    };
-    this.users.push(newUser);
-    return this.getUserSecured(newUser);
-  }
-
+  /*
   async updateUserPassword(
     id: V4Options,
     updatePasswordDto: UpdatePasswordDto,
@@ -90,12 +76,5 @@ export class UsersService {
 
     return this.getUserSecured(this.users[userIndex]);
   }
-
-  async deleteUser(id: V4Options): Promise<void> {
-    const userIndex = this.users.findIndex((user) => user.id === id);
-    if (userIndex === -1) {
-      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
-    }
-    this.users.splice(userIndex, 1);
-  }
+  */
 }

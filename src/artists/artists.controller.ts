@@ -7,40 +7,49 @@ import {
   Put,
   Delete,
   HttpCode,
+  ValidationPipe,
+  UsePipes,
+  ParseUUIDPipe,
 } from '@nestjs/common';
 import { Artist, ArtistsService } from './artists.service';
-import { V4Options } from 'uuid';
+import { ArtistPipe } from './artists.pipe';
+import { CreateArtistrDto } from './dto/creare.artist.dto';
 
 @Controller('artist')
 export class ArtistsController {
   constructor(private readonly artistService: ArtistsService) {}
 
   @Get()
-  async getAllArtists() {
-    return await this.artistService.getAllArtists();
-  }
-
-  @Get(':id')
-  async getArtistById(@Param('id') id: V4Options) {
-    return await this.artistService.getArtistById(id);
+  async getAll() {
+    return await this.artistService.getAll();
   }
 
   @Post()
-  async createArtist(@Body() createArtistDto: Artist) {
-    return await this.artistService.createArtist(createArtistDto);
+  @UsePipes(new ValidationPipe())
+  async create(@Body() createArtistDto: CreateArtistrDto) {
+    return await this.artistService.create(createArtistDto);
   }
 
-  @Put(':id')
-  async updateArtistPassword(
-    @Param('id') id: V4Options,
-    @Body() updatePasswordDto: Artist,
-  ) {
-    return await this.artistService.updateArtist(id, updatePasswordDto);
+  @Get(':id')
+  getById(@Param('id', ParseUUIDPipe, ArtistPipe) user: Artist) {
+    return user;
   }
+
+  /*   @Put(':id')
+  @UsePipes(new ValidationPipe())
+  async updateUserPassword(
+    @Param('id', ParseUUIDPipe, UserPipe) user: User,
+    @Body() updatePasswordDto: UpdatePasswordDto,
+  ) {
+    return await this.artistService.updateUserPassword(
+      user.id,
+      updatePasswordDto,
+    );
+  } */
 
   @Delete(':id')
   @HttpCode(204)
-  async deleteArtist(@Param('id') id: V4Options) {
-    return await this.artistService.deleteArtist(id);
+  async delete(@Param('id', ParseUUIDPipe, UserPipe) user: User) {
+    return await this.artistService.delete(user.id);
   }
 }
