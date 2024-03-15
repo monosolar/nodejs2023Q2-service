@@ -7,40 +7,46 @@ import {
   Put,
   Delete,
   HttpCode,
+  UsePipes,
+  ValidationPipe,
+  ParseUUIDPipe,
 } from '@nestjs/common';
-import { V4Options } from 'uuid';
 import { Album, AlbumsService } from './albums.service';
+import { CreateAlbumDto } from './dto/creare.album.dto';
+import { AlbumPipe } from './albums.pipe';
 
 @Controller('album')
 export class AlbumsController {
   constructor(private readonly albumService: AlbumsService) {}
 
   @Get()
-  async getAllAlbums() {
-    return await this.albumService.getAllAlbums();
-  }
-
-  @Get(':id')
-  async getAlbumById(@Param('id') id: V4Options) {
-    return await this.albumService.getAlbumById(id);
+  async getAll() {
+    return await this.albumService.getAll();
   }
 
   @Post()
-  async createAlbum(@Body() createAlbumDto: Album) {
-    return await this.albumService.createAlbum(createAlbumDto);
+  @UsePipes(new ValidationPipe())
+  async create(@Body() createAlbumDto: CreateAlbumDto) {
+    return await this.albumService.create(createAlbumDto);
   }
 
-  @Put(':id')
-  async updateAlbumPassword(
-    @Param('id') id: V4Options,
-    @Body() updatePasswordDto: Album,
-  ) {
-    return await this.albumService.updateAlbum(id, updatePasswordDto);
+  @Get(':id')
+  getById(@Param('id', ParseUUIDPipe, AlbumPipe) entity: Album) {
+    return entity;
   }
 
   @Delete(':id')
   @HttpCode(204)
-  async deleteAlbum(@Param('id') id: V4Options) {
-    return await this.albumService.deleteAlbum(id);
+  async delete(@Param('id', ParseUUIDPipe, AlbumPipe) entity: Album) {
+    return await this.albumService.delete(entity.id);
+  }
+
+  @Put(':id')
+  @UsePipes(new ValidationPipe())
+  async updateUserPassword(
+    @Param('id', ParseUUIDPipe, AlbumPipe) entity: Album,
+    @Body() updateAlbumDto: CreateAlbumDto,
+  ) {
+    return await this.albumService.update(entity.id, updateAlbumDto);
   }
 }

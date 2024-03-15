@@ -20,35 +20,35 @@ export class FavsService {
 
   async getAll(): Promise<FavoritesResponse> {
     const favorites = {
-      tracks: await this.tracksService.getFav(),
-      albums: await this.albumsService.getFav(),
-      artists: await this.artistsService.getFav(),
+      tracks: await Promise.resolve([]),
+      albums: await Promise.resolve([]),
+      artists: await Promise.resolve([]),
     };
 
     return favorites;
   }
 
   async addTrack(id: V4Options) {
-    await this.tracksService.addFav(id);
+    //await this.tracksService.addFav(id);
   }
 
   async addArtist(id: V4Options) {
-    await this.artistsService.addFav(id);
+    //await this.artistsService.addFav(id);
   }
 
   async addAlbum(id: V4Options) {
-    await this.albumsService.addFav(id);
+    // await this.albumsService.addFav(id);
   }
 
   async deleteTrack(id: V4Options) {
-    await this.tracksService.deleteFav(id);
+    //await this.tracksService.deleteFav(id);
   }
 
   async deleteArtist(id: V4Options) {
-    await this.artistsService.deleteFav(id);
+    //await this.artistsService.deleteFav(id);
   }
 
   async deleteAlbum(id: V4Options) {
-    await this.albumsService.deleteFav(id);
+    //await this.albumsService.deleteFav(id);
   }
 }

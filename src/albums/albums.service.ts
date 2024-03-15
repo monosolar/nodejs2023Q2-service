@@ -1,133 +1,42 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { TracksService } from 'src/tracks/tracks.service';
-import { validateUuid } from 'src/utils';
-import { V4Options, v4 as uuidv4 } from 'uuid';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { AlbumEntity } from './albums.entity';
+import { Repository } from 'typeorm';
+import { CreateAlbumDto } from './dto/creare.album.dto';
 
 export interface Album {
-  id: string; // uuid v4
+  id: string;
   name: string;
   year: number;
-  artistId: string | null; // refers to Artist
+  artistId: string | null;
 }
 
 @Injectable()
 export class AlbumsService {
-  constructor(private tracksService: TracksService) {}
+  constructor(
+    @InjectRepository(AlbumEntity)
+    private readonly albumsRepository: Repository<Album>,
+  ) {}
 
-  private albums: Album[] = [];
-  private favIds: V4Options[] = [];
-
-  async getIsExist(id: V4Options) {
-    const idx = this.albums.findIndex((item) => item.id === id);
-    return idx;
+  async create(createAlbumDto: CreateAlbumDto) {
+    return await this.albumsRepository.save(createAlbumDto);
   }
 
-  async getAllAlbums(): Promise<Album[]> {
-    return this.albums;
+  async getAll() {
+    return await this.albumsRepository.find();
   }
 
-  async getByIds(ids: V4Options[]): Promise<Album[]> {
-    return this.albums.filter((item) => ids.includes(item.id as V4Options));
+  async getById(id: string) {
+    return await this.albumsRepository.findOneBy({ id });
   }
 
-  async getAlbumById(id: V4Options): Promise<Album> {
-    validateUuid(id);
-    const album = this.albums.find((Album) => Album.id === id);
-    if (!album) {
-      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
-    }
-    return album;
+  async delete(id: string) {
+    return await this.albumsRepository.delete({ id });
   }
 
-  async createAlbum(album: Album): Promise<Album> {
-    const { name, year, artistId } = album;
+  async update(id: string, album: CreateAlbumDto): Promise<Album> {
+    await this.albumsRepository.update(id, album);
 
-    if (!name || !year) {
-      throw new HttpException('Incomplete data', HttpStatus.BAD_REQUEST);
-    }
-    const newAlbum: Album = {
-      id: uuidv4(),
-      name,
-      year,
-      artistId,
-    };
-    this.albums.push(newAlbum);
-
-    return newAlbum;
-  }
-
-  async updateAlbum(id: V4Options, album: Album): Promise<Album> {
-    validateUuid(id);
-    const { name, year, artistId } = album;
-
-    if (typeof year !== 'number') {
-      throw new HttpException('Incomplete data', HttpStatus.BAD_REQUEST);
-    }
-
-    const albumIndex = await this.getIsExist(id);
-    if (albumIndex === -1) {
-      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
-    }
-
-    this.albums[albumIndex] = {
-      ...this.albums[albumIndex],
-      name,
-      year,
-      artistId,
-    };
-
-    return this.albums[albumIndex];
-  }
-
-  async deleteAlbum(id: V4Options) {
-    validateUuid(id);
-
-    const albumIndex = await this.getIsExist(id);
-    if (albumIndex === -1) {
-      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
-    }
-    this.albums.splice(albumIndex, 1);
-    this.tracksService.deleteAlbum(id);
-    const favIndex = this.favIds.findIndex((favId) => favId === id);
-    if (favIndex > -1) {
-      this.favIds.splice(favIndex, 1);
-    }
-  }
-
-  async deleteArtists(artistId: V4Options) {
-    this.albums = this.albums.map((album) => {
-      if (album.artistId === artistId) {
-        album.artistId = null;
-      }
-      return album;
-    });
-  }
-
-  async getFav() {
-    return this.getByIds(this.favIds);
-  }
-
-  async addFav(id: V4Options) {
-    validateUuid(id);
-
-    const artistIndex = await this.getIsExist(id);
-    if (artistIndex === -1) {
-      throw new HttpException(
-        'Artist not found',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    if (!this.favIds.includes(id)) {
-      this.favIds.push(id);
-    }
-
-    return id;
-  }
-
-  async deleteFav(id: V4Options) {
-    validateUuid(id);
-    const foundIndex = await this.favIds.findIndex((item) => item === id);
-    this.favIds.splice(foundIndex, 1);
+    return await this.getById(id);
   }
 }
