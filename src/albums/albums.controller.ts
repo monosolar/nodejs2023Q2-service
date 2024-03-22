@@ -12,7 +12,7 @@ import {
   ParseUUIDPipe,
 } from '@nestjs/common';
 import { Album, AlbumsService } from './albums.service';
-import { CreateAlbumDto } from './dto/creare.album.dto';
+import { CreateAlbumDto } from './dto/create.album.dto';
 import { AlbumPipe } from './albums.pipe';
 
 @Controller('album')

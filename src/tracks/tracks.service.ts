@@ -1,141 +1,42 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { validateUuid } from 'src/utils';
-import { V4Options, v4 as uuidv4 } from 'uuid';
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { TrackEntity } from './tracks.entity';
+import { Repository } from 'typeorm';
+import { CreateTrackDto } from './dto/create.track.dto';
 
 export interface Track {
-  id: string; // uuid v4
+  id: string;
   name: string;
-  artistId: string | null; // refers to Artist
-  albumId: string | null; // refers to Album
-  duration: number; // integer number
+  year: number;
+  artistId: string | null;
 }
 
 @Injectable()
 export class TracksService {
-  private tracks: Track[] = [];
-  private favIds: V4Options[] = [];
+  constructor(
+    @InjectRepository(TrackEntity)
+    private readonly tracksRepository: Repository<Track>,
+  ) {}
 
-  async getIsExist(id: V4Options) {
-    const idx = this.tracks.findIndex((item) => item.id === id);
-    return idx;
+  async create(createTrackDto: CreateTrackDto) {
+    return await this.tracksRepository.save(createTrackDto);
   }
 
-  async getAllTracks(): Promise<Track[]> {
-    return this.tracks;
+  async getAll() {
+    return await this.tracksRepository.find();
   }
 
-  async getByIds(ids: V4Options[]): Promise<Track[]> {
-    return this.tracks.filter((item) => ids.includes(item.id as V4Options));
+  async getById(id: string) {
+    return await this.tracksRepository.findOneBy({ id });
   }
 
-  async getTrackById(id: V4Options): Promise<Track> {
-    validateUuid(id);
-    const track = this.tracks.find((Track) => Track.id === id);
-    if (!track) {
-      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
-    }
-    return track;
+  async delete(id: string) {
+    return await this.tracksRepository.delete({ id });
   }
 
-  async createTrack(track: Track): Promise<Track> {
-    const { name, albumId, artistId, duration } = track;
+  async update(id: string, track: CreateTrackDto): Promise<Track> {
+    await this.tracksRepository.update(id, track);
 
-    if (!name || !duration) {
-      throw new HttpException('Incomplete data', HttpStatus.BAD_REQUEST);
-    }
-
-    const newTrack: Track = {
-      id: uuidv4(),
-      name,
-      albumId,
-      artistId,
-      duration,
-    };
-    this.tracks.push(newTrack);
-
-    return newTrack;
-  }
-
-  async updateTrack(id: V4Options, track: Track): Promise<Track> {
-    validateUuid(id);
-    const { name, albumId, artistId, duration } = track;
-
-    if (!name || !duration) {
-      throw new HttpException('Wrong data', HttpStatus.BAD_REQUEST);
-    }
-
-    const trackIndex = await this.getIsExist(id);
-    if (trackIndex === -1) {
-      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
-    }
-
-    this.tracks[trackIndex] = {
-      ...this.tracks[trackIndex],
-      albumId,
-      artistId,
-      duration,
-    };
-
-    return this.tracks[trackIndex];
-  }
-
-  async deleteTrack(id: V4Options) {
-    validateUuid(id);
-    const trackIndex = await this.getIsExist(id);
-    if (trackIndex === -1) {
-      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
-    }
-    this.tracks.splice(trackIndex, 1);
-
-    const favIndex = this.favIds.findIndex((favId) => favId === id);
-    if (favIndex > -1) {
-      this.favIds.splice(favIndex, 1);
-    }
-  }
-
-  async deleteArtists(artistId: V4Options) {
-    this.tracks = this.tracks.map((track) => {
-      if (track.artistId === artistId) {
-        track.artistId = null;
-      }
-      return track;
-    });
-  }
-
-  async deleteAlbum(albumId: V4Options) {
-    this.tracks = this.tracks.map((track) => {
-      if (track.albumId === albumId) {
-        track.albumId = null;
-      }
-      return track;
-    });
-  }
-
-  async getFav() {
-    return this.getByIds(this.favIds);
-  }
-
-  async addFav(id: V4Options) {
-    validateUuid(id);
-
-    const artistIndex = await this.getIsExist(id);
-    if (artistIndex === -1) {
-      throw new HttpException(
-        'Track not found',
-        HttpStatus.UNPROCESSABLE_ENTITY,
-      );
-    }
-
-    if (!this.favIds.includes(id)) {
-      this.favIds.push(id);
-    }
-
-    return id;
-  }
-
-  async deleteFav(id: V4Options) {
-    validateUuid(id);
-    const foundIndex = await this.favIds.findIndex((item) => item === id);
-    this.favIds.splice(foundIndex, 1);
+    return await this.getById(id);
   }
 }

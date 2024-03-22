@@ -9,6 +9,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersEntity } from './users/users.entity';
 import { ArtistEntity } from './artists/artists.entity';
 import { AlbumEntity } from './albums/albums.entity';
+import { TrackEntity } from './tracks/tracks.entity';
 
 @Module({
   imports: [
@@ -19,7 +20,7 @@ import { AlbumEntity } from './albums/albums.entity';
       username: 'eugenekosenko',
       password: 'root',
       database: 'rsschool',
-      entities: [UsersEntity, ArtistEntity, AlbumEntity],
+      entities: [UsersEntity, ArtistEntity, AlbumEntity, TrackEntity],
       synchronize: true,
     }),
     ConfigModule.forRoot({ envFilePath: '.env' }),

@@ -7,40 +7,47 @@ import {
   Put,
   Delete,
   HttpCode,
+  ParseUUIDPipe,
+  UsePipes,
+  ValidationPipe,
 } from '@nestjs/common';
 import { V4Options } from 'uuid';
 import { Track, TracksService } from './tracks.service';
+import { TrackPipe } from './track.pipe';
+import { CreateTrackDto } from './dto/create.track.dto';
 
 @Controller('track')
 export class TracksController {
   constructor(private readonly trackService: TracksService) {}
 
   @Get()
-  async getAllTracks() {
-    return await this.trackService.getAllTracks();
-  }
-
-  @Get(':id')
-  async getTrackById(@Param('id') id: V4Options) {
-    return await this.trackService.getTrackById(id);
+  async getAll() {
+    return await this.trackService.getAll();
   }
 
   @Post()
-  async createTrack(@Body() createtrackDto: Track) {
-    return await this.trackService.createTrack(createtrackDto);
+  @UsePipes(new ValidationPipe())
+  async create(@Body() createTrackDto: CreateTrackDto) {
+    return await this.trackService.create(createTrackDto);
   }
 
-  @Put(':id')
-  async updateTrack(
-    @Param('id') id: V4Options,
-    @Body() updatePasswordDto: Track,
-  ) {
-    return await this.trackService.updateTrack(id, updatePasswordDto);
+  @Get(':id')
+  getById(@Param('id', ParseUUIDPipe, TrackPipe) entity: Track) {
+    return entity;
   }
 
   @Delete(':id')
   @HttpCode(204)
-  async deletetrack(@Param('id') id: V4Options) {
-    return await this.trackService.deleteTrack(id);
+  async delete(@Param('id', ParseUUIDPipe, TrackPipe) entity: Track) {
+    return await this.trackService.delete(entity.id);
+  }
+
+  @Put(':id')
+  @UsePipes(new ValidationPipe())
+  async updateUserPassword(
+    @Param('id', ParseUUIDPipe, TrackPipe) entity: Track,
+    @Body() updateTrackDto: CreateTrackDto,
+  ) {
+    return await this.trackService.update(entity.id, updateTrackDto);
   }
 }
