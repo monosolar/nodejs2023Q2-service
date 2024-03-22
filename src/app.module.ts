@@ -14,6 +14,7 @@ import { TrackEntity } from './tracks/tracks.entity';
 @Module({
   imports: [
     TypeOrmModule.forRoot({
+      // todo put to env
       type: 'postgres',
       host: 'localhost',
       port: 5432,

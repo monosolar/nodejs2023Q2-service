@@ -1,10 +1,4 @@
-import {
-  PrimaryGeneratedColumn,
-  Generated,
-  Column,
-  Entity,
-  OneToMany,
-} from 'typeorm';
+import { PrimaryGeneratedColumn, Column, Entity } from 'typeorm';
 
 @Entity()
 export class ArtistEntity {
