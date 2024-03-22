@@ -1,54 +1,52 @@
 import { Injectable } from '@nestjs/common';
-import { Album, AlbumsService } from 'src/albums/albums.service';
-import { Artist, ArtistsService } from 'src/artists/artists.service';
-import { Track, TracksService } from 'src/tracks/tracks.service';
-import { V4Options } from 'uuid';
-
-export interface FavoritesResponse {
-  artists: Artist[];
-  albums: Album[];
-  tracks: Track[];
-}
+import { InjectRepository } from '@nestjs/typeorm';
+import { AlbumEntity } from 'src/albums/albums.entity';
+import { Album } from 'src/albums/albums.service';
+import { ArtistEntity } from 'src/artists/artists.entity';
+import { Artist } from 'src/artists/artists.service';
+import { TrackEntity } from 'src/tracks/tracks.entity';
+import { Track } from 'src/tracks/tracks.service';
+import { Repository } from 'typeorm';
+import { FavAlbumsEntity } from './entities/fav.albums.entity';
 
 @Injectable()
 export class FavsService {
   constructor(
-    private tracksService: TracksService,
-    private albumsService: AlbumsService,
-    private artistsService: ArtistsService,
+    @InjectRepository(FavAlbumsEntity)
+    private readonly favAlbumsRepository,
   ) {}
 
-  async getAll(): Promise<FavoritesResponse> {
+  async getAll() {
     const favorites = {
-      tracks: await Promise.resolve([]),
-      albums: await Promise.resolve([]),
-      artists: await Promise.resolve([]),
+      tracks: await this.favAlbumsRepository.find(),
+      albums: await this.favAlbumsRepository.find(),
+      artists: await this.favAlbumsRepository.find(),
     };
 
     return favorites;
   }
 
-  async addTrack(id: V4Options) {
-    //await this.tracksService.addFav(id);
+  async addTrack(trackId: string) {
+    //return await this.favAlbumsRepository.save({ trackId });
   }
 
-  async addArtist(id: V4Options) {
+  async addArtist(id: string) {
     //await this.artistsService.addFav(id);
   }
 
-  async addAlbum(id: V4Options) {
-    // await this.albumsService.addFav(id);
+  async addAlbum(albumId: string) {
+    return await this.favAlbumsRepository.save({ albumId });
   }
 
-  async deleteTrack(id: V4Options) {
+  async deleteTrack(id: string) {
     //await this.tracksService.deleteFav(id);
   }
 
-  async deleteArtist(id: V4Options) {
+  async deleteArtist(id: string) {
     //await this.artistsService.deleteFav(id);
   }
 
-  async deleteAlbum(id: V4Options) {
+  async deleteAlbum(id: string) {
     //await this.albumsService.deleteFav(id);
   }
 }

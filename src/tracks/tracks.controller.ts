@@ -11,7 +11,6 @@ import {
   UsePipes,
   ValidationPipe,
 } from '@nestjs/common';
-import { V4Options } from 'uuid';
 import { Track, TracksService } from './tracks.service';
 import { TrackPipe } from './track.pipe';
 import { CreateTrackDto } from './dto/create.track.dto';

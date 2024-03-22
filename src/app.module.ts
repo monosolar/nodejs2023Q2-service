@@ -10,6 +10,7 @@ import { UsersEntity } from './users/users.entity';
 import { ArtistEntity } from './artists/artists.entity';
 import { AlbumEntity } from './albums/albums.entity';
 import { TrackEntity } from './tracks/tracks.entity';
+import { FavAlbumsEntity } from './favs/entities/fav.albums.entity';
 
 @Module({
   imports: [
@@ -21,7 +22,13 @@ import { TrackEntity } from './tracks/tracks.entity';
       username: 'eugenekosenko',
       password: 'root',
       database: 'rsschool',
-      entities: [UsersEntity, ArtistEntity, AlbumEntity, TrackEntity],
+      entities: [
+        UsersEntity,
+        ArtistEntity,
+        AlbumEntity,
+        TrackEntity,
+        FavAlbumsEntity,
+      ],
       synchronize: true,
     }),
     ConfigModule.forRoot({ envFilePath: '.env' }),

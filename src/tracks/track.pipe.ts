@@ -6,12 +6,12 @@ export class TrackPipe implements PipeTransform<string, Promise<Track>> {
   constructor(private readonly trackssService: TracksService) {}
 
   async transform(id: Track['id']) {
-    const user = await this.trackssService.getById(id);
+    const entity = await this.trackssService.getById(id);
 
-    if (!user) {
+    if (!entity) {
       throw new NotFoundException(`No entry with id ${id}`);
     }
 
-    return user;
+    return entity;
   }
 }

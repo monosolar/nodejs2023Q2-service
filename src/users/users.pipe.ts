@@ -6,12 +6,12 @@ export class UserPipe implements PipeTransform<string, Promise<User>> {
   constructor(private readonly userService: UsersService) {}
 
   async transform(id: User['id']) {
-    const user = await this.userService.getById(id);
+    const entity = await this.userService.getById(id);
 
-    if (!user) {
+    if (!entity) {
       throw new NotFoundException(`No entry with id ${id}`);
     }
 
-    return user;
+    return entity;
   }
 }

@@ -1,6 +1,21 @@
-import { Controller, Delete, Get, HttpCode, Param, Post } from '@nestjs/common';
-import { V4Options } from 'uuid';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  Param,
+  ParseUUIDPipe,
+  Post,
+  UsePipes,
+  ValidationPipe,
+} from '@nestjs/common';
 import { FavsService } from './favs.service';
+import { TrackPipe } from 'src/tracks/track.pipe';
+import { Track } from 'src/tracks/tracks.service';
+import { Artist } from 'src/artists/artists.service';
+import { ArtistPipe } from 'src/artists/artists.pipe';
+import { AlbumEntity } from 'src/albums/albums.entity';
+import { AlbumPipe } from 'src/albums/albums.pipe';
 
 @Controller('favs')
 export class FavsController {
@@ -12,35 +27,50 @@ export class FavsController {
   }
 
   @Post('track/:id')
-  async addTrack(@Param('id') id: V4Options) {
+  @UsePipes(new ValidationPipe())
+  async addTrack(@Param('id', ParseUUIDPipe, TrackPipe) entity: Track) {
+    const { id } = entity;
     return await this.favsService.addTrack(id);
   }
 
   @Post('artist/:id')
-  async addArtist(@Param('id') id: V4Options) {
+  @UsePipes(new ValidationPipe())
+  async addArtist(@Param('id', ParseUUIDPipe, ArtistPipe) entity: Artist) {
+    const { id } = entity;
     return await this.favsService.addArtist(id);
   }
 
   @Post('album/:id')
-  async addAlbum(@Param('id') id: V4Options) {
+  @UsePipes(new ValidationPipe())
+  async addAlbum(@Param('id', ParseUUIDPipe, AlbumPipe) entity: AlbumEntity) {
+    const { id } = entity;
+    console.log('--->', 'id', id);
     return await this.favsService.addAlbum(id);
   }
 
   @Delete('track/:id')
+  @UsePipes(new ValidationPipe())
   @HttpCode(204)
-  async deleteTrack(@Param('id') id: V4Options) {
+  async deleteTrack(@Param('id', ParseUUIDPipe, TrackPipe) entity: Track) {
+    const { id } = entity;
     return await this.favsService.deleteTrack(id);
   }
 
   @Delete('artist/:id')
+  @UsePipes(new ValidationPipe())
   @HttpCode(204)
-  async deleteArtist(@Param('id') id: V4Options) {
+  async deleteArtist(@Param('id', ParseUUIDPipe, ArtistPipe) entity: Artist) {
+    const { id } = entity;
     return await this.favsService.deleteArtist(id);
   }
 
   @Delete('album/:id')
+  @UsePipes(new ValidationPipe())
   @HttpCode(204)
-  async deleteAlbum(@Param('id') id: V4Options) {
+  async deleteAlbum(
+    @Param('id', ParseUUIDPipe, AlbumPipe) entity: AlbumEntity,
+  ) {
+    const { id } = entity;
     return await this.favsService.deleteAlbum(id);
   }
 }
