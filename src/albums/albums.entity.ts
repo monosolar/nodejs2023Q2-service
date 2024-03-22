@@ -1,6 +1,14 @@
+import { UUID } from 'crypto';
 import { ArtistEntity } from 'src/artists/artists.entity';
-import { TrackEntity } from 'src/tracks/tracks.entity';
-import { PrimaryGeneratedColumn, Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import {
+  PrimaryGeneratedColumn,
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  OneToOne,
+  JoinColumn,
+} from 'typeorm';
 
 @Entity()
 export class AlbumEntity {
@@ -14,13 +22,9 @@ export class AlbumEntity {
   year: number;
 
   @Column({ type: 'varchar', nullable: true })
-  artistId: string | null;
-
-  @ManyToOne(() => ArtistEntity, (artist) => artist.albums, {
+  @OneToOne(() => ArtistEntity, {
     onDelete: 'SET NULL',
   })
-  artist: ArtistEntity;
-
-  @OneToMany(() => TrackEntity, (track) => track.artist)
-  tracks: TrackEntity[];
+  @JoinColumn({ name: 'artistId', referencedColumnName: 'id' })
+  artistId: UUID | null;
 }

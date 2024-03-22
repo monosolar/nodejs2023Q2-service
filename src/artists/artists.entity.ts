@@ -1,5 +1,3 @@
-import { AlbumEntity } from 'src/albums/albums.entity';
-import { TrackEntity } from 'src/tracks/tracks.entity';
 import {
   PrimaryGeneratedColumn,
   Generated,
@@ -18,10 +16,4 @@ export class ArtistEntity {
 
   @Column({ type: 'boolean', nullable: false })
   grammy: boolean;
-
-  @OneToMany(() => AlbumEntity, (album) => album.artist)
-  albums: AlbumEntity[];
-
-  @OneToMany(() => TrackEntity, (track) => track.artist)
-  tracks: TrackEntity[];
 }
