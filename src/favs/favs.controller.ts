@@ -44,7 +44,6 @@ export class FavsController {
   @UsePipes(new ValidationPipe())
   async addAlbum(@Param('id', ParseUUIDPipe, AlbumPipe) entity: AlbumEntity) {
     const { id } = entity;
-    console.log('--->', 'id', id);
     return await this.favsService.addAlbum(id);
   }
 

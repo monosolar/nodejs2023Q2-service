@@ -9,6 +9,8 @@ import { ArtistModule } from 'src/artists/artists.module';
 import { AlbumsModule } from 'src/albums/albums.module';
 import { TracksModule } from 'src/tracks/tracks.module';
 import { FavAlbumsEntity } from './entities/fav.albums.entity';
+import { FavArtistsEntity } from './entities/fav.artists.entity';
+import { FavTracksEntity } from './entities/fav.tracks.entity';
 
 @Module({
   controllers: [FavsController],
@@ -18,6 +20,8 @@ import { FavAlbumsEntity } from './entities/fav.albums.entity';
     TypeOrmModule.forFeature([AlbumEntity]),
     TypeOrmModule.forFeature([TrackEntity]),
     TypeOrmModule.forFeature([FavAlbumsEntity]),
+    TypeOrmModule.forFeature([FavArtistsEntity]),
+    TypeOrmModule.forFeature([FavTracksEntity]),
     ArtistModule,
     AlbumsModule,
     TracksModule,

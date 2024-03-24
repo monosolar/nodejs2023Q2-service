@@ -15,3 +15,13 @@ export const validateUuid = (id: V4Options) => {
 
 export const cloneObject = (value: Record<string, any>): Record<string, any> =>
   JSON.parse(JSON.stringify(value));
+
+export const getEntityIds = async (repository, key: string) => {
+  const entities = await repository.find({
+    select: {
+      [key]: true,
+    },
+  });
+
+  return entities.map((entity) => entity[key]);
+};

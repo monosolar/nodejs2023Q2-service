@@ -11,6 +11,8 @@ import { ArtistEntity } from './artists/artists.entity';
 import { AlbumEntity } from './albums/albums.entity';
 import { TrackEntity } from './tracks/tracks.entity';
 import { FavAlbumsEntity } from './favs/entities/fav.albums.entity';
+import { FavArtistsEntity } from './favs/entities/fav.artists.entity';
+import { FavTracksEntity } from './favs/entities/fav.tracks.entity';
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { FavAlbumsEntity } from './favs/entities/fav.albums.entity';
         AlbumEntity,
         TrackEntity,
         FavAlbumsEntity,
+        FavArtistsEntity,
+        FavTracksEntity,
       ],
       synchronize: true,
     }),

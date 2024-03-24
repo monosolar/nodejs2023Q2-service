@@ -1,4 +1,4 @@
-import { AlbumEntity } from 'src/albums/albums.entity';
+import { TrackEntity } from 'src/tracks/tracks.entity';
 import {
   PrimaryGeneratedColumn,
   Column,
@@ -8,14 +8,14 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class FavAlbumsEntity {
+export class FavTracksEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ type: 'uuid', nullable: false })
-  @OneToOne(() => AlbumEntity, {
+  @OneToOne(() => TrackEntity, {
     onDelete: 'CASCADE',
   })
   @JoinColumn({ name: 'albumId', referencedColumnName: 'id' })
-  albumId: string;
+  trackId: string;
 }
