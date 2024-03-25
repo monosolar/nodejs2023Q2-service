@@ -1,18 +1,46 @@
-services:
- 
+version: '3.8' # up-to-date
+
+services: 
   db:
     image: postgres
+    container_name: hls-db
     restart: always
-    environment:
-      POSTGRES_PASSWORD: example
+    environment: 
+      - POSTGRES_USER=${DATABASE_USER}
+      - POSTGRES_PASSWORD=${DATABASE_PASSWORD}
+      - POSTGRES_DB=${DATABASE_NAME}
+      - POSTGRES_PORT=${POSTGRES_PORT}
     volumes:
-- pgdata:/var/lib/postgresql/data
- 
-volumes:
-  pgdata:
- 
-  adminer:
-    image: adminer
+      - pgdata-2024:/var/lib/postgresql/data
+    networks:
+      - hls-network
+    ports: 
+      - "${POSTGRES_PORT}:5432"
+
+  nestjs:
+    image: nestjs-rest-service-2024
+    container_name: hls-nest
+    build: 
+      context: .
+      dockerfile: ./Dockerfile
     restart: always
-    ports:
-      - 8080:8080
+    env_file:
+      - .env
+    ports: 
+      - "${PORT}:${PORT}"
+    depends_on: 
+      - db
+    networks:
+      - hls-network
+    volumes: 
+      - .:/app
+      - node_modules-2024:/app/node_modules
+
+volumes:
+  pgdata-2024:
+  pgadmin-data-2024:
+  node_modules-2024:
+
+networks:
+  hls-network:
+    driver: bridge
